@@ -25,9 +25,10 @@ def get_agent_and_client(req: ChatRequest):
             detail="Missing Jira credentials or GEMINI_API_KEY in request/environment."
         )
     # Initialize Jira context
+    project_key = req.project_key or os.getenv("PROJECT_KEY")
     conn = ProjectConnectionRequest(
         jira_url=jira_url,
-        user_email=user_email,
+        email=user_email,
         api_token=api_token,
         project_key=req.project_key
     )
@@ -36,7 +37,7 @@ def get_agent_and_client(req: ChatRequest):
     agent = build_jira_agent_graph(gemini_key)
     return agent
 
-
+@router.post("", response_model=ChatResponse)
 async def chat_sync(req: ChatRequest):
     """
     Standard synchronous chat endpoint.
